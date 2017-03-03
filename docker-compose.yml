@@ -1,0 +1,73 @@
+# BASE
+app: &app
+  image: codextremist/rails
+  links:
+    - pg:postgres
+    - es:elasticsearch
+    - redis:redis
+  volumes:
+    - .:/app
+  environment:
+    RAILS_ENV: development
+
+# DEVELOPMENT ENVIRONMENT
+web:
+  <<: *app
+  ports:
+    - "3000:3000"
+  command: rails server -b 0.0.0.0
+
+
+# TEST ENVIRONMENT
+cucumber:
+  image: codextremist/rails
+  command: rake cucumber
+  links:
+    - pg:postgres
+    - es:elasticsearch
+    - redis:redis
+    - selenium_firefox:selenium_firefox
+    - selenium_chrome:selenium_chrome
+  volumes:
+    - ${PWD}:/app
+  ports:
+    - '3001:3001'
+  environment:
+    RAILS_ENV: test
+
+selenium_firefox:
+  image: selenium/standalone-firefox-debug:3.0.1-aluminum
+  ports:
+    - '4446:4444'
+    - '5902:5900'
+
+selenium_chrome:
+  image: selenium/standalone-chrome-debug:3.0.1-aluminum
+  ports:
+    - '4445:4444'
+    - '5901:5900'
+
+# EXTERNAL SERVICES
+mailcatcher:
+  image: schickling/mailcatcher
+  ports:
+    - "1025:1025"
+    - "1080:1080"
+redis:
+  image: redis
+  ports:
+    - "6379:6379"
+  volumes:
+    - ~/.docker_volumes/redis:/data
+pg:
+  image: postgres:9.4
+  ports:
+    - "5432:5432"
+  volumes:
+    - ~/.docker_volumes/pg:/var/lib/postgresql/data
+es:
+  image: codextremist/elasticsearch-plugins:1.7
+  ports:
+    - "9200:9200"
+  volumes:
+    - ~/.docker_volumes/es/data:/usr/share/elasticsearch/data

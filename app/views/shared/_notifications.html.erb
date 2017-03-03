@@ -1,0 +1,14 @@
+<script>
+$(function() {
+  counter = 0;
+  window.setInterval(function(){
+    counter += 1;
+    $.ajax({
+      url: "<%= notifications_path %>",
+      async: true
+    }).done(function(data){
+      $('#notifications').append("<p>" + data + "</p>");
+    });
+  }, 3000);
+});
+</script>

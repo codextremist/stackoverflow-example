@@ -1,0 +1,15 @@
+default: &default
+  adapter:  postgresql
+  encoding: unicode
+  timeout: 20000
+  host: <%= ENV['POSTGRES_PORT_5432_TCP_ADDR'] %>
+  pool: 5
+  username: postgres
+
+development:
+  <<: *default
+  database: stackoverflow_dev
+
+test:
+  <<: *default
+  database: stackoverflow_test
